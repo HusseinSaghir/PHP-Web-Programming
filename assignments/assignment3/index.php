@@ -31,5 +31,5 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             <textarea style="height: 500px;" class="form-control" id="namelist" name="namelist"><?php echo $output ?></textarea>
         </div>
     </form>
-</body>
+</body> 
 </html>

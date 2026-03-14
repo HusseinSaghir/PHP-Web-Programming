@@ -2,15 +2,15 @@
 
 class Directories {
 
-private string $basePath;
-private string $message = '';
-private bool $success = false;
-private string $filePath = '';
+private $basePath;
+private $message = '';
+private $success = false;
+private $filePath = '';
 
 public function __construct() {
 
 //points us to the directories folder
-this->basePath = __DIR__ . '/../directories/';
+$this->basePath = __DIR__ . '/../directories/';
 }
 
 //Creates new directories folder 

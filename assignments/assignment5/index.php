@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($isSuccess) {
         $filePath = $directories->getFilePath();
     }
-}
+} 
 ?>
 
 <!DOCTYPE html>
