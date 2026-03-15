@@ -15,11 +15,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $directories->createDirectory($dirName, $content);
 
     $message = $directories->getMessage();
-    $isSuccess = $directories->$isSuccess();
+    $isSuccess = $directories->isSuccess();
 
     if ($isSuccess) {
         $filePath = $directories->getFilePath();
-    }
+    } 
 } 
 ?>
 

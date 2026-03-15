@@ -13,8 +13,16 @@ public function __construct() {
 $this->basePath = __DIR__ . '/../directories/';
 }
 
+
 //Creates new directories folder 
 public function createDirectory(string $dirName, string $content): void {
+
+//Parameters for folder creation
+if(!preg_match('/^[A-Za-z0-9]+$/', $dirName)) {
+        $this->message = 'Error: Folder name must contain letters or numbers only.';
+        $this->success = false;
+        return;
+    }
 
 $newDirPath = $this->basePath .$dirName;
 
@@ -25,13 +33,14 @@ if(is_dir($newDirPath)) {
 }
 
 //Attempts to make new directory
-if(!mkdir($newDirPath)) {
+if(!mkdir($newDirPath, 0777, true)) {
     $this->message = 'Error: The directory could not be created because you lack proper permissions.';
     $this->success = false;
     return;
 }
 
 //Attempts to create new readme.txt in the new directory
+$readmePath = $newDirPath . '/readme.txt';
 if(file_put_contents($readmePath, $content) === false) {
     $this->message = 'Error: The file could not be created';
 
