@@ -1,86 +1,77 @@
 <?php
-require_once 'Db_conn.php';
-require_once 'Pdo_methods.php';
+require_once __DIR__ . '/Pdo_methods.php';
 
 class Date_time {
-    private $conn;
+
     private $pdo;
 
     public function __construct() {
-        $db = new Db_conn();
-        $this ->conn = $db->getConn(); 
-        $this->pdo = new Pdo_methods();
+        $this->pdo = new PdoMethods();
     }
 
-    //Called on both pages
     public function checkSubmit() {
-
-    if(isset($_POST['dateTime'])) {
-        return $this->addNote();
+        if (isset($_POST['dateTime'])) {
+            return $this->addNote();
+        }
+        if (isset($_POST['begDate'])) {
+            return $this->getNotes();
+        }
+        return '';
     }
 
-    if(isset($_POST['begDate'])) {
-        return $this->getNotes();
-    }
-    
-        return ''; //Page loads up
-    }
-
-
-    //Add note function
     private function addNote() {
-
         $dateTime = $_POST['dateTime'];
-        $note = trim($_POST['note']);
+        $note     = trim($_POST['note']);
 
-        if(empty($dateTime) || empty($note)) {
-            return '<p class="text-danger">You must enter a date, time and a note.</p>';
+        if (empty($dateTime) || empty($note)) {
+            return '<p class="text-danger">You must enter a date, time, and note.</p>';
         }
 
-        //Convert dateTime to string
-        $timeStamp = strtotime($dateTime);
+        $timestamp = strtotime($dateTime);
 
         $sql = "INSERT INTO note (date_time, note) VALUES (:date_time, :note)";
-        $params = [':date_time' => $timeStamp, ':note' => $note];
 
-        $this->pdo->insert($this->conn, $sql, $params);
+        $bindings = [
+            [':date_time', $timestamp, 'int'],
+            [':note',      $note,      'str']
+        ];
+
+        $result = $this->pdo->otherBinded($sql, $bindings);
+
+        if ($result === 'error') {
+            return '<p class="text-danger">There was an error saving your note.</p>';
+        }
 
         return '<p class="text-success">Note added successfully.</p>';
     }
 
-    
-    //Handles displaying our notes
     private function getNotes() {
-
         $begDate = $_POST['begDate'];
         $endDate = $_POST['endDate'];
 
-
-        if(empty($begDate) || empty($endDate)) {
+        if (empty($begDate) || empty($endDate)) {
             return '<p class="text-danger">No notes found for the date range selected.</p>';
         }
 
-        // Convert the date-only strings to timestamps.
-        // begDate starts at midnight (00:00:00) automatically.
-        // endDate gets 23:59:59 so the full ending day is included.
+        // Convert the date into strings for timestamps
         $begTimestamp = strtotime($begDate);
         $endTimestamp = strtotime($endDate . ' 23:59:59');
 
-        $sql = "SELECT date_time, note FROM note
-                WHERE date_time BETWEEN :begDate AND :endDate
+        $sql = "SELECT date_time, note FROM note 
+                WHERE date_time BETWEEN :begDate AND :endDate 
                 ORDER BY date_time DESC";
 
-        $params = [':begDate' => $begTimestamp, ':endDate' => $endTimestamp];
+        $bindings = [
+            [':begDate', $begTimestamp, 'int'],
+            [':endDate', $endTimestamp, 'int']
+        ];
 
-        $results = this->pdo->select($this->conn, $sql, $params);
+        $results = $this->pdo->selectBinded($sql, $bindings);
 
-
-         if (empty($results)) {
+        if ($results === 'error' || empty($results)) {
             return '<p class="text-danger">No notes found for the date range selected.</p>';
         }
 
-
-         // Build the HTML table
         $output  = '<table class="table table-bordered table-striped">';
         $output .= '<thead>
                         <tr>
@@ -90,12 +81,11 @@ class Date_time {
                     </thead>';
         $output .= '<tbody>';
 
+        //Converts back into readable state
+        foreach ($results as $row) {
 
-        foreach($results as $row) {
-
-            //Converts our timestamp back to something we can read
             $formatted = date('n/d/Y h:i a', $row['date_time']);
-
+            
             $output .= '<tr>';
             $output .= '<td>' . $formatted . '</td>';
             $output .= '<td>' . htmlspecialchars($row['note']) . '</td>';
@@ -103,7 +93,6 @@ class Date_time {
         }
 
         $output .= '</tbody></table>';
-
         return $output;
     }
 }
