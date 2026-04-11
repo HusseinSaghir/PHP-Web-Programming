@@ -78,11 +78,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $formConfig = $form->validateForm($_POST, $formConfig);
 
-    if(empty($formConfig['password']['error']) && empty($formConfig['confirmPassword']['error'])) {
-        if($formConfig['password']['value'] !== $formConfig['confirmPassword']['value']) {
-           $formConfig['confirmPassword']['error'] = 'Your passwords do not match';
-        }
+if (!empty($formConfig['password']['value']) && !empty($formConfig['confirmPassword']['value'])) {
+    if ($formConfig['password']['value'] !== $formConfig['confirmPassword']['value']) {
+        $formConfig['confirmPassword']['error'] = 'Your passwords do not match';
     }
+}
+
+if (empty($formConfig['password']['error'])) {
+    if (!preg_match('/^(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}$/', $formConfig['password']['value'])) {
+        $formConfig['password']['error'] = 'Must have at least (8 characters, 1 uppercase, 1 symbol, 1 number)';
+    }
+}
+
+if (empty($formConfig['confirmPassword']['error'])) {
+    if (!preg_match('/^(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}$/', $formConfig['confirmPassword']['value'])) {
+        $formConfig['confirmPassword']['error'] = 'Must have at least (8 characters, 1 uppercase, 1 symbol, 1 number)';
+    }
+}
 
     $hasErrors = $formConfig['masterStatus']['error'];
     foreach (['firstName', 'lastName', 'email', 'password', 'confirmPassword'] as $field) {
@@ -117,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $message = 'You have been added to the database';
 
-            foreach (['firstName',  'lastName', 'email',  'password', 'confirmedPassword'] as $field) {
+            foreach (['firstName',  'lastName', 'email',  'password', 'confirmPassword'] as $field) {
                 $formConfig[$field]['value'] = '';
             }
         }
@@ -161,7 +173,7 @@ $records = $pdo->selectNotBinded($sql);
     <!-- Password field -->
     <div class="col-4 mb-2">
                 <label for="password"><?= $formConfig['password']['label'] ?></label>
-                <input type="password"
+                <input type="text"
                        class="form-control"
                        id="password"
                        name="password"
@@ -174,7 +186,7 @@ $records = $pdo->selectNotBinded($sql);
             <!-- Manual confirm password field -->
             <div class="col-4 mb-2">
                 <label for="confirmPassword"><?= $formConfig['confirmPassword']['label'] ?></label>
-                <input type="password"
+                <input type="text"
                        class="form-control"
                        id="confirmPassword"
                        name="confirmPassword"
