@@ -42,6 +42,12 @@ $formConfig = [
             'wi' => 'Wisconsin'
         ]
     ],
+    'zip' => [
+    'type' => 'text', 'id' => 'zip', 'name' => 'zip',
+    'label' => 'Zip Code', 'value' => '', 'regex' => 'zip',
+    'required' => true, 'error' => '',
+    'errorMsg' => 'Zip code must be in the format 12345 or 12345-6789.'
+    ],
     'phone' => [
         'type' => 'text', 'id' => 'phone', 'name' => 'phone',
         'label' => 'Phone', 'value' => '', 'regex' => 'phone',
@@ -96,8 +102,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
         
 
         $pdo = new PdoMethods();
-        $sql = "INSERT INTO contacts (fname, lname, address, city, state, phone, email, dob, contacts, age)
-                VALUES (:fname, :lname, :address, :city, :state, :phone, :email, :dob, :contacts, :age)";
+        $sql = "INSERT INTO contacts (fname, lname, address, city, state, zip, phone, email, dob, contacts, age)
+        VALUES (:fname, :lname, :address, :city, :state, :zip, :phone, :email, :dob, :contacts, :age)";
 
         $bindings = [
             [':fname',    $formConfig['fname']['value'],    'str'],
@@ -105,6 +111,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
             [':address',  $formConfig['address']['value'],  'str'],
             [':city',     $formConfig['city']['value'],     'str'],
             [':state',    $formConfig['state']['selected'], 'str'],
+            [':zip',      $formConfig['zip']['value'],      'str'],
             [':phone',    $formConfig['phone']['value'],    'str'],
             [':email',    $formConfig['email']['value'],    'str'],
             [':dob',      $formConfig['dob']['value'],      'str'],
@@ -115,22 +122,24 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
         $result = $pdo->otherBinded($sql, $bindings);
 
         if($result === 'noerror') {
-            $message = '<p class="text-success">Contact Information Added</p>';
-            //Resets form to blank on success
-            foreach($formConfig as $key => &$element) {
-                if($key === 'masterStatus') continue;
-               $element['value'] = '';
-                $element['error'] = '';
-                if (isset($element['selected'])) $element['selected'] = '0';
-                if (isset($element['options'])) {
-                    foreach ($element['options'] as &$opt) {
-                        $opt['checked'] = false;
-                    }
+    $message = '<p class="text-success">Contact Information Added</p>';
+    // Resets form to blank on success
+    foreach($formConfig as $key => &$element) {
+        if($key === 'masterStatus') continue;
+        $element['value'] = '';
+        $element['error'] = '';
+        if (isset($element['selected'])) $element['selected'] = '0';
+        if (isset($element['options'])) {
+            foreach ($element['options'] as &$opt) {
+                if (is_array($opt)) {
+                    $opt['checked'] = false;
                 }
             }
-        } else {
-            $message = '<p class="text-danger">There was an error adding the record</p>';
         }
     }
+} else {
+    $message = '<p class="text-danger">There was an error adding the record</p>';
 }
+ }
+    }
 ?>

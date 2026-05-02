@@ -13,6 +13,7 @@ function init() {
     $address = $form->renderInput($formConfig['address'],  'col-12 mb-3');
     $city    = $form->renderInput($formConfig['city'],     'col-md-4 mb-3');
     $state   = $form->renderSelect($formConfig['state'],   'col-md-4 mb-3');
+    $zip = $form->renderInput($formConfig['zip'],           'col-md-4 mb-3');
     $phone   = $form->renderInput($formConfig['phone'],    'col-md-4 mb-3');
     $email   = $form->renderInput($formConfig['email'],    'col-md-4 mb-3');
     $dob     = $form->renderInput($formConfig['dob'],      'col-md-4 mb-3');
@@ -34,6 +35,7 @@ function init() {
         <div class="row">
             $city
             $state
+            $zip
         </div>
         <div class="row">
             $phone
