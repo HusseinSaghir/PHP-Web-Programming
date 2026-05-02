@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once('../classes/Pdo_methods.php');
+require_once(dirname(__DIR__) . '/classes/Pdo_methods.php');
 
 $email = trim($_POST['email'] ?? '');
 $password = trim($_POST['password'] ?? '');
@@ -12,7 +12,7 @@ if(empty($email) || empty($password)) {
 }
 
 $pdo = new PdoMethods();
-$sql = "SELECT * FROM admins WHERE email = email";
+$sql = "SELECT * FROM admins WHERE email = :email";
 $bindings = [
     [':email', $email, 'str']
 ];
@@ -27,7 +27,7 @@ if($result === 'error' || count($result) === 0) {
 
 $admin = $result[0];
 
-if(!password_verfy($password, $admin['password'])) {
+if(!password_verify($password, $admin['password'])) {
     $_SESSION['login_error'] = 'Invalid email or password.';
     header('location: ../index.php?page=login');
     exit;

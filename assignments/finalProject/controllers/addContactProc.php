@@ -1,6 +1,6 @@
 <?php 
-require_once('classes/StickyForm.php');
-require_once('classes/Pdo_methods.php');
+require_once(dirname(__DIR__) . '/classes/StickyForm.php');
+require_once(dirname(__DIR__) . '/classes/Pdo_methods.php');
 
 $formConfig = [
     'masterStatus' => ['error' => false],
@@ -90,8 +90,10 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stickyForm = new StickyForm();
     $formConfig = $stickyForm->validateForm($_POST, $formConfig);
 
-    if(!$formConfigp['masterStatus']['error']) {
-        $contactArray = $_POST['contacts'] ?? [];
+    if(!$formConfig['masterStatus']['error']) {
+        $contactsArray = $_POST['contacts'] ?? [];
+        $contactsStr   = implode(',', $contactsArray);
+        
 
         $pdo = new PdoMethods();
         $sql = "INSERT INTO contacts (fname, lname, address, city, state, phone, email, dob, contacts, age)
